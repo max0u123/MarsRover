@@ -1,7 +1,13 @@
 # MarsRover
-Le Rover est positionné sur une planète toroïdale de taille finie entière. Il est caractérisé par ses coordonnées (x, y) représentant son point d'impact sur la planète, ainsi que son orientation de départ, qui peut être N (nord), S (sud), E (est) ou W (ouest). Le Rover est capable d'exécuter les commandes suivantes :
+Vous connaissez le point d’impact du Rover (x,y) et son orientation de départ (N,S,E,W)
 
-Avancer
-Reculer
-Tourner de 90° vers la droite ou la gauche
-Après chaque commande, le Rover renvoie son nouvel état, comprenant sa position (coordonnées x et y) et son orientation.
+Le Rover sait avancer, reculer et tourner de 90° sur lui-même dans les 2 sens.
+Après chaque commande il renvoie son état (position et orientation)
+Les planètes sont toroïdales et de taille finie entière.
+
+Groupe A:
+Maxime Coulon
+Gabriel Odillard
+Lucas Ducourneau
+Rémi Rault
+Maxence Quilichini
