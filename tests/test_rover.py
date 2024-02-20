@@ -17,7 +17,7 @@ class TestRover(unittest.TestCase):
         rover = Rover(0, 0, 'N')
         rover.avancer()
         rover.tourner_droite()
-        self.assertEqual(rover.obtenir_etat(), {'x': 0, 'y': 0, 'orientation': 'N'})
+        self.assertEqual(rover.obtenir_etat(), {'x': 0, 'y': -1, 'orientation': 'E'})
 
 if __name__ == '__main__':
     unittest.main()
