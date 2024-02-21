@@ -1,6 +1,7 @@
 import math
 import random
-import datetime
+
+from utils.printing import print_input_with_timestamp, print_with_timestamp
 
 class Rover:
     def __init__(self, x, y, orientation):
@@ -73,15 +74,6 @@ class Rover:
 
     def _check_collision(self, x, y, obstacles):
         return (round(x, 2), round(y, 2)) in obstacles
-    
-def print_with_timestamp(*messages):
-    timestamp = datetime.datetime.now().strftime("%H:%M:%S")
-    message = ' '.join(map(str, messages))
-    print(f"[{timestamp}] {message}")
-
-def print_input_with_timestamp(message):
-    timestamp = datetime.datetime.now().strftime("%H:%M:%S")
-    print(f"[{timestamp}] {message}", end="")
 
 if __name__ == "__main__":
     try:
