@@ -1,4 +1,6 @@
 import math
+import random
+import datetime
 
 class Rover:
     def __init__(self, x, y, orientation):
@@ -70,26 +72,80 @@ class Rover:
             return self.x - step, self.y
 
     def _check_collision(self, x, y, obstacles):
-        #corriger pour avoir le bon y 
         return (round(x, 2), round(y, 2)) in obstacles
+    
+def print_with_timestamp(*messages):
+    timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+    message = ' '.join(map(str, messages))
+    print(f"[{timestamp}] {message}")
+
+def print_input_with_timestamp(message):
+    timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {message}", end="")
 
 if __name__ == "__main__":
-    x = float(input("Entrez la coordonnée x du rover : "))
-    y = float(input("Entrez la coordonnée y du rover : "))
-    orientation = input("Entrez l'orientation du rover (N, S, E ou O) : ")
-    print("État initial du rover : {'x': "+str(round(x,2))+" 'y': "+str(round(y,2))+", 'orientation': '"+orientation+"'}")
+    try:
+        print_input_with_timestamp("Entrez la coordonnée x du rover : ")
+        x = float(input())
+    except ValueError:
+        print_with_timestamp("La valeur entrée n'est pas valide. Veuillez entrer un nombre.")
+        exit(1)
+    
+    try:
+        print_input_with_timestamp("Entrez la coordonnée y du rover : ")
+        y = float(input())
+    except ValueError:
+        print_with_timestamp("La valeur entrée n'est pas valide. Veuillez entrer un nombre.")
+        exit(1)
+    
+    print_input_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
+    orientation = input().upper()
+
+    while orientation not in ['N', 'S', 'E', 'O']:
+        print_with_timestamp("L'orientation entrée n'est pas valide. Veuillez entrer N, S, E ou O.")
+        print_input_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
+        orientation = input().upper()
+
+    print_with_timestamp("État initial du rover : {'x': "+str(round(x,2))+" 'y': "+str(round(y,2))+", 'orientation': '"+orientation+"'}")
     rover = Rover(x, y, orientation)
+    
+    try:
+        print_input_with_timestamp("Entrez le nombre d'obstacles : ")
+        num_obstacles = int(input())
+    except ValueError:
+        print_with_timestamp("La valeur entrée n'est pas valide. Veuillez entrer un nombre entier.")
+        exit(1)
 
-    obstacles = [(2, 2), (3, 3), (4, 4)]
-
-    rover.reculer(obstacles)
-    print(rover.obtenir_etat())
-    rover.tourner_angle(300)
-    rover.avancer(obstacles)
-
-    if rover.obstacle_encountered:
-        print("Obstacle rencontré à la position :", rover.obtenir_etat()['x'], rover.obtenir_etat()['y'])
-    else:
-        print("Aucun obstacle rencontré. État final du rover :", rover.obtenir_etat())
-
-    rover.reinitialiser_obstacle()
+    obstacles = [{'x': random.randint(0, 10), 'y': random.randint(0, 10)} for _ in range(num_obstacles)]
+    
+    while not rover.obstacle_encountered:
+        print_input_with_timestamp("Entrez une commande (avancer, reculer, gauche, droite, angle ,dodo) : ")
+        command = input()
+        if command == 'avancer':
+            rover.avancer(obstacles)
+        elif command == 'reculer':
+            rover.reculer(obstacles)
+        elif command == 'gauche':
+            rover.tourner_gauche()
+        elif command == 'droite':
+            rover.tourner_droite()
+        elif command == 'angle':
+            try:
+                print_input_with_timestamp("Entrez l'angle de rotation : ")
+                angle = float(input())
+            except ValueError:
+                print_with_timestamp("La valeur entrée n'est pas valide. Veuillez entrer un nombre.")
+                continue
+            rover.tourner_angle(angle)
+        elif command == 'dodo':
+            print_with_timestamp("Le rover s'endort")
+            print_with_timestamp("Dernière position du rover : {'x': ",rover.obtenir_etat()['x']," 'y': ",rover.obtenir_etat()['y'],", 'orientation': '",rover.obtenir_etat()['orientation'],"'}")
+            if not rover.obstacle_encountered:
+                break
+        else:
+            print_with_timestamp("Commande invalide - Ressayer !")
+            continue
+        print_with_timestamp("État actuel du rover : {'x': ",rover.obtenir_etat()['x']," 'y': ",rover.obtenir_etat()['y'],", 'orientation': '",rover.obtenir_etat()['orientation'],"'}")
+            
+    if command != 'dodo':
+        print_with_timestamp("Obstacle rencontré à la positiion :", rover.obtenir_etat()['x'], rover.obtenir_etat()['y'])
