@@ -5,7 +5,7 @@ class Rover:
         self._x = x
         self._y = y
         self.orientation = orientation
-        self.obstacle_encountered = False  # Variable pour suivre si un obstacle a été rencontré
+        self.obstacle_encountered = False
 
     @property
     def x(self):
@@ -19,27 +19,19 @@ class Rover:
         self._x = round(new_x, 2)
         self._y = round(new_y, 2)
 
-    def avancer(self):
-        if not self.obstacle_encountered:  # Vérifie s'il n'y a pas déjà d'obstacle
-            if self.orientation == 'N':
-                self.modifier_position(self.x, self.y - 1)
-            elif self.orientation == 'S':
-                self.modifier_position(self.x, self.y + 1)
-            elif self.orientation == 'E':
-                self.modifier_position(self.x + 1, self.y)
-            elif self.orientation == 'O':
-                self.modifier_position(self.x - 1, self.y)
+    def avancer(self, obstacles):
+        next_x, next_y = self._next_position(1)
+        if not self._check_collision(next_x, next_y, obstacles):
+            self.modifier_position(next_x, next_y)
+        else:
+            self.rencontrer_obstacle()
 
-    def reculer(self):
-        if not self.obstacle_encountered:
-            if self.orientation == 'N':
-                self.modifier_position(self.x, self.y + 1)
-            elif self.orientation == 'S':
-                self.modifier_position(self.x, self.y - 1)
-            elif self.orientation == 'E':
-                self.modifier_position(self.x - 1, self.y)
-            elif self.orientation == 'O':
-                self.modifier_position(self.x + 1, self.y)
+    def reculer(self, obstacles):
+        next_x, next_y = self._next_position(-1)
+        if not self._check_collision(next_x, next_y, obstacles):
+            self.modifier_position(next_x, next_y)
+        else:
+            self.rencontrer_obstacle()
 
     def tourner_gauche(self):
         if not self.obstacle_encountered:
@@ -65,7 +57,21 @@ class Rover:
         return {'x': self.x, 'y': self.y, 'orientation': self.orientation, 'obstacle_encountered': self.obstacle_encountered}
 
     def reinitialiser_obstacle(self):
-        self.obstacle_encountered = False  # Réinitialise le statut de l'obstacle
+        self.obstacle_encountered = False 
+
+    def _next_position(self, step):
+        if self.orientation == 'N':
+            return self.x, self.y - step
+        elif self.orientation == 'S':
+            return self.x, self.y + step
+        elif self.orientation == 'E':
+            return self.x + step, self.y
+        elif self.orientation == 'O':
+            return self.x - step, self.y
+
+    def _check_collision(self, x, y, obstacles):
+        #corriger pour avoir le bon y 
+        return (round(x, 2), round(y, 2)) in obstacles
 
 if __name__ == "__main__":
     x = float(input("Entrez la coordonnée x du rover : "))
@@ -74,15 +80,16 @@ if __name__ == "__main__":
     print("État initial du rover : {'x': "+str(round(x,2))+" 'y': "+str(round(y,2))+", 'orientation': '"+orientation+"'}")
     rover = Rover(x, y, orientation)
 
-    # Instructions
-    rover.reculer()
+    obstacles = [(2, 2), (3, 3), (4, 4)]
+
+    rover.reculer(obstacles)
+    print(rover.obtenir_etat())
     rover.tourner_angle(300)
-    rover.avancer()
+    rover.avancer(obstacles)
 
     if rover.obstacle_encountered:
         print("Obstacle rencontré à la position :", rover.obtenir_etat()['x'], rover.obtenir_etat()['y'])
     else:
         print("Aucun obstacle rencontré. État final du rover :", rover.obtenir_etat())
 
-    # Réinitialise l'obstacle
     rover.reinitialiser_obstacle()
