@@ -2,13 +2,24 @@ import random
 from domain.map import Map
 from utils.printing import print_input_with_timestamp, print_with_timestamp
 from domain.rover import Rover
-# Class Infrastucture
+
+# Classe Infrastructure
 class RoverController:
     def __init__(self):
+        """
+        Initialise un objet RoverController avec les attributs map et rover.
+
+        Attributes:
+            map (Map): La carte sur laquelle le rover se déplace.
+            rover (Rover): Le rover contrôlé par le RoverController.
+        """
         self.map = None
         self.rover = None
 
     def _create_map(self):
+        """
+        Crée une nouvelle carte en demandant à l'utilisateur d'entrer la largeur, la hauteur et le nombre d'obstacles.
+        """
         try:
             print_input_with_timestamp("Entrez la largeur de la carte : ")
             width = int(input())
@@ -26,6 +37,9 @@ class RoverController:
         self.map.obstacles = self.map.generate_obstacles(num_obstacles)
 
     def _create_rover(self):
+        """
+        Crée un nouveau rover en demandant à l'utilisateur d'entrer les coordonnées et l'orientation.
+        """
         try:
             print_input_with_timestamp("Entrez la coordonnée x du rover : ")
             x = float(input())
@@ -46,6 +60,12 @@ class RoverController:
         self.rover = Rover(x, y, orientation, obstacles=self.map.obstacles)
 
     def _retry_movement(self, direction):
+        """
+        Demande à l'utilisateur s'il souhaite réessayer un mouvement après avoir rencontré un obstacle.
+
+        Args:
+            direction (int): La direction du mouvement (1 pour avancer, -1 pour reculer).
+        """
         print_with_timestamp("Déplacement impossible car obstacle. Réessayez.")
         while True:
             command = input("Voulez-vous réessayer ? (o/n): ").lower()
@@ -58,11 +78,13 @@ class RoverController:
                 print_with_timestamp("Commande invalide. Veuillez entrer 'o' pour oui ou 'n' pour non.")
 
     def _print_obstacles(self):
+        """Imprime les positions des obstacles sur la carte."""
         print_with_timestamp("Positions des obstacles:")
         for obstacle in self.map.obstacles:
             print_with_timestamp(obstacle)
 
     def run(self):
+        """Exécute le contrôleur du rover, permettant à l'utilisateur de commander les mouvements du rover."""
         self._create_map()
         self._print_obstacles()
         self._create_rover()
@@ -87,4 +109,3 @@ class RoverController:
             elif command == 'dodo':
                 print_with_timestamp("The rover s'endort.")
                 print_with_timestamp("Dernière position du rover:", self.rover.obtenir_etat())
-            
