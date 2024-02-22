@@ -1,5 +1,5 @@
 import unittest
-from rover import Rover
+from src.domain.rover import Rover
 
 class TestRover(unittest.TestCase):
 
