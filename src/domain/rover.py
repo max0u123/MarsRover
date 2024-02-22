@@ -1,3 +1,4 @@
+#Class Domain Entité - Objet
 class Rover:
     def __init__(self, x, y, orientation, obstacles):
         self._x = x

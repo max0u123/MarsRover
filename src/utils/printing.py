@@ -1,4 +1,4 @@
-import datetime
+import datetime , time
 
 def print_with_timestamp(*messages):
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")

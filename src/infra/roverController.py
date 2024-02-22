@@ -2,7 +2,7 @@ import random
 from domain.map import Map
 from utils.printing import print_input_with_timestamp, print_with_timestamp
 from domain.rover import Rover
-
+# Class Infrastucture
 class RoverController:
     def __init__(self):
         self.map = None
@@ -50,10 +50,10 @@ class RoverController:
         while True:
             command = input("Voulez-vous réessayer ? (o/n): ").lower()
             if command == 'o':
-                self.rover.modifier_position(*self.rover._next_position(direction))
                 break
             elif command == 'n':
-                break
+                print_with_timestamp("Fin de déplacement pour le rover en position:", self.rover.obtenir_etat())
+                exit(0)
             else:
                 print_with_timestamp("Commande invalide. Veuillez entrer 'o' pour oui ou 'n' pour non.")
 
@@ -68,8 +68,8 @@ class RoverController:
         self._create_rover()
 
         while not self.rover.obstacle_encountered:
-            print_with_timestamp("Current rover state:", self.rover.obtenir_etat())
-            command = input("Enter a command (avancer, reculer, gauche, droite, dodo): ")
+            print_with_timestamp("Position Actuelle du Rover:", self.rover.obtenir_etat())
+            command = input("Entrez une commande (avancer, reculer, gauche, droite, dodo): ")
             if command == 'avancer':
                 if not self.rover._check_collision(*self.rover._next_position(1)):
                     self.rover.avancer()

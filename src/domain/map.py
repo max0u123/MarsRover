@@ -1,4 +1,5 @@
 import random
+#Class Domain Entité
 class Map:
     def __init__(self, width, height):
         self.width = width
