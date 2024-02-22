@@ -1,4 +1,5 @@
 import datetime
+import time
 
 def print_with_timestamp(*messages):
     """
