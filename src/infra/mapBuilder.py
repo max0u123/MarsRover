@@ -16,7 +16,6 @@ class MapBuilder:
                     new_map = Map(width, height)
                     new_map.obstacles = new_map.generate_obstacles(num_obstacles)
                     return new_map
-                else:
-                    raise ValueError
+                raise ValueError
             except ValueError:
                 print_with_timestamp("Les valeurs entrées ne sont pas valides. Veuillez entrer des entiers positifs.")

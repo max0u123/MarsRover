@@ -7,8 +7,8 @@ class RoverMovement:
     def move_to(rover, x, y):
         if not RoverCollision.check_collision(rover, x, y):
             rover.modifier_position(x, y)
-        else:
-            rover.rencontrer_obstacle()
+            return
+        rover.rencontrer_obstacle()
 
     @staticmethod
     def move_forward(rover):

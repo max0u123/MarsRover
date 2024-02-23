@@ -48,12 +48,11 @@ class Rover:
         while True:
             command = input("Voulez-vous réessayer ? (o/n): ").lower()
             if command == 'o':
-                return direction 
+                continue
             elif command == 'n':
                 print_with_timestamp("Fin de déplacement pour le rover en position:", self.obtenir_etat())
                 exit(0)
-            else:
-                print_with_timestamp("Commande invalide. Veuillez entrer 'o' pour oui ou 'n' pour non.")
+            print_with_timestamp("Commande invalide. Veuillez entrer 'o' pour oui ou 'n' pour non.")
 
     def check_collision(self, x, y):
         return self._check_collision(x, y)
@@ -61,9 +60,9 @@ class Rover:
     def move_to(self, x, y):
         if not self._check_collision(x, y):
             self.modifier_position(x, y)
-        else:
-            self.rencontrer_obstacle()
-            self._retry_movement(1 if (x, y) == RoverCalculations.calculate_next_position(self, 1) else -1)
+            return
+        self.rencontrer_obstacle()
+        self._retry_movement(1 if (x, y) == RoverCalculations.calculate_next_position(self, 1) else -1)
 
     def move_forward(self):
         next_x, next_y = RoverCalculations.calculate_next_position(self, 1)
