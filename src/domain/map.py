@@ -1,46 +1,19 @@
+# Fichier domain/map.py
+
 import random
 
-# Class Domain Entité.
 class Map:
     def __init__(self, width, height):
-        """
-        Initialise un objet Map avec une largeur, une hauteur et une liste d'obstacles.
-
-        Args:
-            width (int): Largeur de la carte.
-            height (int): Hauteur de la carte.
-
-        Attributes:
-            width (int): Largeur de la carte.
-            height (int): Hauteur de la carte.
-            obstacles (set): Ensemble des positions des obstacles sur la carte.
-        """
-        self.width = width
-        self.height = height
-        self.obstacles = set()
+        self._width = width
+        self._height = height
+        self._obstacles = set()
 
     def generate_obstacles(self, num_obstacles):
-        """
-        Génère un ensemble aléatoire d'obstacles sur la carte.
+        self._obstacles.clear()
+        return self._generate_obstacles(num_obstacles)
 
-        Args:
-            num_obstacles (int): Nombre d'obstacles à générer.
+    def _generate_obstacles(self, num_obstacles):
+        return {(random.randint(0, self._width - 1), random.randint(0, self._height - 1)) for _ in range(num_obstacles)}
 
-        Returns:
-            set: Ensemble des positions des obstacles générés.
-        """
-        self.obstacles.clear()
-        return {(random.randint(0, self.width - 1), random.randint(0, self.height - 1)) for _ in range(num_obstacles)}
-
-    def check_collision(self, x, y):
-        """
-        Vérifie s'il y a une collision avec un obstacle aux coordonnées spécifiées.
-
-        Args:
-            x (int): Coordonnée x à vérifier.
-            y (int): Coordonnée y à vérifier.
-
-        Returns:
-            bool: True s'il y a collision, False sinon.
-        """
-        return (x, y) in self.obstacles
+    def has_collision(self, x, y):
+        return (x, y) in self._obstacles
