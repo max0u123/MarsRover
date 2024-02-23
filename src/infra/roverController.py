@@ -57,7 +57,8 @@ class RoverController:
             print_input_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
             orientation = input().upper()
 
-        self.rover = Rover(x, y, orientation, obstacles=self.map.obstacles)
+        self.rover = Rover(x, y, orientation, obstacles=self.map.obstacles, map=self.map)
+
 
     def _retry_movement(self, direction):
         """
