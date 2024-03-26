@@ -48,6 +48,10 @@ class RoverController:
                     self.rover.tourner_droite()
                     print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
                     continue
+                else:
+                    print_with_timestamp(f"Mauvaise commande insérée par le client! {command}")
+                    continue
+
 
         except websockets.ConnectionClosed:
             print_with_timestamp("Connexion WebSocket fermée.")
@@ -97,5 +101,7 @@ class RoverController:
             print_with_timestamp("L'orientation entrée n'est pas valide. Veuillez entrer N, S, E ou O.")
             print_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
             orientation = (await self.async_input()).upper()
+        print_with_timestamp(f"En attente du lancement client ...")
+            
 
         self.rover = Rover(x, y, orientation, obstacles=self.map.obstacles, map=self.map)
