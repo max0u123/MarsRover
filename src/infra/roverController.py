@@ -28,20 +28,26 @@ class RoverController:
                     if not self.rover._check_collision(*self.rover._next_position(1)):
                         self.rover.avancer()
                         print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                        continue
                     else:
                         await websocket.send("Déplacement impossible car obstacle. Réessayez.")
+                        continue
                 elif command == 'reculer':
                     if not self.rover._check_collision(*self.rover._next_position(-1)):
                         self.rover.reculer()
                         print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                        continue
                     else:
                         await websocket.send("Déplacement impossible car obstacle. Réessayez.")
+                        continue
                 elif command == 'gauche':
                     self.rover.tourner_gauche()
                     print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                    continue
                 elif command == 'droite':
                     self.rover.tourner_droite()
                     print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                    continue
 
         except websockets.ConnectionClosed:
             print_with_timestamp("Connexion WebSocket fermée.")
@@ -52,7 +58,7 @@ class RoverController:
         await self.create_rover()
 
         async with websockets.serve(self.handle_command, "localhost", 8765):
-            await asyncio.Future()  # Keep serving indefinitely
+            await asyncio.Future()
 
     async def create_map(self):
         try:
