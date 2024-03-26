@@ -2,8 +2,10 @@ import random
 from domain.map import Map
 from utils.printing import print_input_with_timestamp, print_with_timestamp
 from domain.rover import Rover
+import socket
 
 # Classe Infrastructure
+
 class RoverController:
     def __init__(self):
         """
@@ -15,6 +17,7 @@ class RoverController:
         """
         self.map = None
         self.rover = None
+        self.server_socket = None
 
     def _create_map(self):
         """
@@ -84,15 +87,49 @@ class RoverController:
         for obstacle in self.map.obstacles:
             print_with_timestamp(obstacle)
 
+    def _create_server_socket(self):
+        """
+        Crée un socket serveur pour la communication avec le client.
+        """
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.bind(("localhost", 8000))
+        self.server_socket.listen(1)
+        print("Le serveur est prêt à écouter...")
+
+    def _accept_client_connection(self):
+        """
+        Accepte la connexion d'un client.
+        """
+        client_socket, client_address = self.server_socket.accept()
+        print("Connexion établie avec", client_address)
+        return client_socket
+
+    def _receive_command(self, client_socket):
+        """
+        Reçoit une commande du client.
+        """
+        command = client_socket.recv(1024).decode()
+        return command
+
+    def _send_response(self, client_socket, response):
+        """
+        Envoie une réponse au client.
+        """
+        client_socket.send(response.encode())
+
     def run(self):
         """Exécute le contrôleur du rover, permettant à l'utilisateur de commander les mouvements du rover."""
         self._create_map()
         self._print_obstacles()
         self._create_rover()
+        self._create_server_socket()
 
         while not self.rover.obstacle_encountered:
             print_with_timestamp("Position Actuelle du Rover:", self.rover.obtenir_etat())
-            command = input("Entrez une commande (avancer, reculer, gauche, droite, dodo): ")
+            # Attend la connexion d'un client
+            client_socket = self._accept_client_connection()
+            # Reçoit la commande du client
+            command = self._receive_command(client_socket)
             if command == 'avancer':
                 if not self.rover._check_collision(*self.rover._next_position(1)):
                     self.rover.avancer()
@@ -110,3 +147,8 @@ class RoverController:
             elif command == 'dodo':
                 print_with_timestamp("The rover s'endort.")
                 print_with_timestamp("Dernière position du rover:", self.rover.obtenir_etat())
+            # Envoie la nouvelle position du rover en réponse
+            self._send_response(client_socket, f"Nouvelle position du rover : {self.rover.obtenir_etat()}")
+            client_socket.close()
+
+        print_with_timestamp("Fin de déplacement pour le rover en position:", self.rover.obtenir_etat())
