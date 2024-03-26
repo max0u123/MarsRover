@@ -22,12 +22,13 @@ class RoverController:
             while True:
                 command = await websocket.recv()
                 command = command.strip()
-                print_with_timestamp(f"Command received from client: {command}")
+                print_with_timestamp(f"Commande reçue du client : {command}")
 
                 if command == 'avancer':
                     if not self.rover._check_collision(*self.rover._next_position(1)):
                         self.rover.avancer()
                         print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                        await websocket.send(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
                         continue
                     else:
                         await websocket.send("Déplacement impossible car obstacle. Réessayez.")
@@ -36,6 +37,7 @@ class RoverController:
                     if not self.rover._check_collision(*self.rover._next_position(-1)):
                         self.rover.reculer()
                         print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                        await websocket.send(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
                         continue
                     else:
                         await websocket.send("Déplacement impossible car obstacle. Réessayez.")
@@ -43,17 +45,25 @@ class RoverController:
                 elif command == 'gauche':
                     self.rover.tourner_gauche()
                     print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                    await websocket.send(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
                     continue
                 elif command == 'droite':
                     self.rover.tourner_droite()
                     print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                    await websocket.send(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
                     continue
+                elif command == 'quitter':
+                    print_with_timestamp("Le client a demandé à quitter.")
+                    await websocket.send("Connexion WebSocket fermée.")
+                    await websocket.wait_closed()
+                    return
                 else:
-                    print_with_timestamp(f"Mauvaise commande insérée par le client! {command}")
+                    print_with_timestamp(f"Mauvaise commande insérée par le client!")
+                    await websocket.send("❌ Commande invalide. Veuillez réessayer.")
                     continue
-
 
         except websockets.ConnectionClosed:
+            await websocket.send("Connexion WebSocket fermée.")
             print_with_timestamp("Connexion WebSocket fermée.")
 
 
@@ -101,7 +111,7 @@ class RoverController:
             print_with_timestamp("L'orientation entrée n'est pas valide. Veuillez entrer N, S, E ou O.")
             print_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
             orientation = (await self.async_input()).upper()
-        print_with_timestamp(f"En attente du lancement client ...")
+        print_with_timestamp(f"⌛ En attente du lancement client...")
             
 
         self.rover = Rover(x, y, orientation, obstacles=self.map.obstacles, map=self.map)

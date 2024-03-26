@@ -6,9 +6,17 @@ async def send_commands():
     async with websockets.connect(uri) as websocket:
         print("Connexion établie avec le serveur. Vous pouvez commencer à envoyer des commandes.")
         while True:
-            command = input("Entrez une commande (avancer, reculer, gauche, droite) : ")
-            await websocket.send(command)
-            if command == 'exit':  # Marqueur spécial pour terminer les commandes
+            command = input("------------------------------------------------------------\n Entrez une commande (avancer, reculer, gauche, droite, quitter): ")
+            try:
+                await websocket.send(command)
+                await process_response(websocket, command)
+            except websockets.exceptions.WebSocketException as e:
+                print(f"Erreur lors de l'envoi de la commande: {e}")
+            if command == 'quitter':
                 break
+
+async def process_response(websocket, command):
+    response = await websocket.recv()
+    print(f"Réponse du serveur: {response}")
 
 asyncio.run(send_commands())
