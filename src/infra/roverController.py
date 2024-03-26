@@ -1,32 +1,77 @@
-import random
-from domain.map import Map
-from utils.printing import print_input_with_timestamp, print_with_timestamp
+import asyncio
+import websockets
 from domain.rover import Rover
+from domain.map import Map
+from utils.printing import print_with_timestamp
 
-# Classe Infrastructure
 class RoverController:
     def __init__(self):
-        """
-        Initialise un objet RoverController avec les attributs map et rover.
-
-        Attributes:
-            map (Map): La carte sur laquelle le rover se déplace.
-            rover (Rover): Le rover contrôlé par le RoverController.
-        """
         self.map = None
         self.rover = None
 
-    def _create_map(self):
+    async def async_input(self):
         """
-        Crée une nouvelle carte en demandant à l'utilisateur d'entrer la largeur, la hauteur et le nombre d'obstacles.
+        Obtient une entrée de l'utilisateur de manière asynchrone.
         """
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, input)
+
+    async def handle_command(self, websocket, path):
+        print_with_timestamp("Le programme de contrôle du rover a démarré.")
         try:
-            print_input_with_timestamp("Entrez la largeur de la carte : ")
-            width = int(input())
-            print_input_with_timestamp("Entrez la hauteur de la carte : ")
-            height = int(input())
-            print_input_with_timestamp("Entrez le nombre d'obstacles : ")
-            num_obstacles = int(input())
+            while True:
+                command = await websocket.recv()
+                command = command.strip()
+                print_with_timestamp(f"Command received from client: {command}")
+
+                if command == 'avancer':
+                    if not self.rover._check_collision(*self.rover._next_position(1)):
+                        self.rover.avancer()
+                        print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                        continue
+                    else:
+                        await websocket.send("Déplacement impossible car obstacle. Réessayez.")
+                        continue
+                elif command == 'reculer':
+                    if not self.rover._check_collision(*self.rover._next_position(-1)):
+                        self.rover.reculer()
+                        print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                        continue
+                    else:
+                        await websocket.send("Déplacement impossible car obstacle. Réessayez.")
+                        continue
+                elif command == 'gauche':
+                    self.rover.tourner_gauche()
+                    print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                    continue
+                elif command == 'droite':
+                    self.rover.tourner_droite()
+                    print_with_timestamp(f"Position actuelle du rover : {self.rover.obtenir_etat()}")
+                    continue
+                else:
+                    print_with_timestamp(f"Mauvaise commande insérée par le client! {command}")
+                    continue
+
+
+        except websockets.ConnectionClosed:
+            print_with_timestamp("Connexion WebSocket fermée.")
+
+
+    async def run(self):
+        await self.create_map()
+        await self.create_rover()
+
+        async with websockets.serve(self.handle_command, "localhost", 8765):
+            await asyncio.Future()
+
+    async def create_map(self):
+        try:
+            print_with_timestamp("Entrez la largeur de la carte : ")
+            width = int(await self.async_input())
+            print_with_timestamp("Entrez la hauteur de la carte : ")
+            height = int(await self.async_input())
+            print_with_timestamp("Entrez le nombre d'obstacles : ")
+            num_obstacles = int(await self.async_input())
             if width <= 0 or height <= 0 or num_obstacles < 0:
                 raise ValueError
         except ValueError:
@@ -36,77 +81,27 @@ class RoverController:
         self.map = Map(width, height)
         self.map.obstacles = self.map.generate_obstacles(num_obstacles)
 
-    def _create_rover(self):
+    async def create_rover(self):
         """
         Crée un nouveau rover en demandant à l'utilisateur d'entrer les coordonnées et l'orientation.
         """
         try:
-            print_input_with_timestamp("Entrez la coordonnée x du rover : ")
-            x = float(input())
-            print_input_with_timestamp("Entrez la coordonnée y du rover : ")
-            y = float(input())
+            print_with_timestamp("Entrez la coordonnée x du rover : ")
+            x = float(await self.async_input())
+            print_with_timestamp("Entrez la coordonnée y du rover : ")
+            y = float(await self.async_input())
         except ValueError:
             print_with_timestamp("La valeur entrée n'est pas valide. Veuillez entrer un nombre.")
             exit(1)
 
-        print_input_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
-        orientation = input().upper()
+        print_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
+        orientation = (await self.async_input()).upper()
 
         while orientation not in ['N', 'S', 'E', 'O']:
             print_with_timestamp("L'orientation entrée n'est pas valide. Veuillez entrer N, S, E ou O.")
-            print_input_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
-            orientation = input().upper()
+            print_with_timestamp("Entrez l'orientation du rover (N, S, E ou O) : ")
+            orientation = (await self.async_input()).upper()
+        print_with_timestamp(f"En attente du lancement client ...")
+            
 
         self.rover = Rover(x, y, orientation, obstacles=self.map.obstacles, map=self.map)
-
-
-    def _retry_movement(self, direction):
-        """
-        Demande à l'utilisateur s'il souhaite réessayer un mouvement après avoir rencontré un obstacle.
-
-        Args:
-            direction (int): La direction du mouvement (1 pour avancer, -1 pour reculer).
-        """
-        print_with_timestamp("Déplacement impossible car obstacle. Réessayez.")
-        while True:
-            command = input("Voulez-vous réessayer ? (o/n): ").lower()
-            if command == 'o':
-                break
-            elif command == 'n':
-                print_with_timestamp("Fin de déplacement pour le rover en position:", self.rover.obtenir_etat())
-                exit(0)
-            else:
-                print_with_timestamp("Commande invalide. Veuillez entrer 'o' pour oui ou 'n' pour non.")
-
-    def _print_obstacles(self):
-        """Imprime les positions des obstacles sur la carte."""
-        print_with_timestamp("Positions des obstacles:")
-        for obstacle in self.map.obstacles:
-            print_with_timestamp(obstacle)
-
-    def run(self):
-        """Exécute le contrôleur du rover, permettant à l'utilisateur de commander les mouvements du rover."""
-        self._create_map()
-        self._print_obstacles()
-        self._create_rover()
-
-        while not self.rover.obstacle_encountered:
-            print_with_timestamp("Position Actuelle du Rover:", self.rover.obtenir_etat())
-            command = input("Entrez une commande (avancer, reculer, gauche, droite, dodo): ")
-            if command == 'avancer':
-                if not self.rover._check_collision(*self.rover._next_position(1)):
-                    self.rover.avancer()
-                else:
-                    self._retry_movement(1)
-            elif command == 'reculer':
-                if not self.rover._check_collision(*self.rover._next_position(-1)):
-                    self.rover.reculer()
-                else:
-                    self._retry_movement(-1)
-            elif command == 'gauche':
-                self.rover.tourner_gauche()
-            elif command == 'droite':
-                self.rover.tourner_droite()
-            elif command == 'dodo':
-                print_with_timestamp("The rover s'endort.")
-                print_with_timestamp("Dernière position du rover:", self.rover.obtenir_etat())
