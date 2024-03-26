@@ -6,8 +6,10 @@ Après chaque commande il renvoie son état (position et orientation)
 Les planètes sont toroïdales et de taille finie entière.
 
 ### Lancer le projet
+Lancer ```pip3 install -r requirements.txt``` dans le dossier MarsRover pour installer les requirements.
 
-Pour lancer le projet, il faut lancer le fichier ```server_main.py```. Ensuite, lorsque cela est demandé, lancer le fichier ```client.py```.
+Ensuite, pour lancer le projet, il faut lancer le fichier ```server_main.py```. 
+Par la suite, lorsque cela est demandé, lancer le fichier ```client.py```.
 
 > Toutes les interactions seront à faire depuis le client.
 
