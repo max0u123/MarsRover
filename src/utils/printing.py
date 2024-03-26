@@ -1,5 +1,6 @@
 import datetime
 import time
+import asyncio
 
 def print_with_timestamp(*messages):
     """
@@ -15,7 +16,7 @@ def print_with_timestamp(*messages):
     message = ' '.join(map(str, messages))
     print(f"[{timestamp}] {message}")
 
-def print_input_with_timestamp(message):
+async def print_input_with_timestamp(message):
     """
     Imprime un message avec un horodatage au format HH:MM:SS, sans saut de ligne à la fin.
 
@@ -23,7 +24,8 @@ def print_input_with_timestamp(message):
         message (str): Le message à imprimer.
 
     Example:
-        print_input_with_timestamp("Message d'entrée")
+        await print_input_with_timestamp("Message d'entrée")
     """
     timestamp = datetime.datetime.now().strftime("%H:%M:%S")
     print(f"[{timestamp}] {message}", end="")
+    await asyncio.sleep(0)  # Permet de rendre la fonction asynchrone

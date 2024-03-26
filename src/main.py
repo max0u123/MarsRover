@@ -1,5 +1,6 @@
+import asyncio
 from infra.roverController import RoverController
 
 if __name__ == "__main__":
     controller = RoverController()
-    controller.run()
+    asyncio.run(controller.run())
