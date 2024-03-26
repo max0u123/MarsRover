@@ -36,6 +36,7 @@ class RoverController:
         self.map = Map(width, height)
         self.map.obstacles = self.map.generate_obstacles(num_obstacles)
 
+    
     def _create_rover(self):
         """
         Crée un nouveau rover en demandant à l'utilisateur d'entrer les coordonnées et l'orientation.

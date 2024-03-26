@@ -44,3 +44,6 @@ class Map:
             bool: True s'il y a collision, False sinon.
         """
         return (x, y) in self.obstacles
+    
+    def dimensionMap(self):
+        return self.width, self.height 

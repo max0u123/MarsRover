@@ -1,3 +1,5 @@
+from domain.map import Map
+
 # Class Domain Entité - Objet
 class Rover:
     def __init__(self, x, y, orientation, obstacles):
@@ -17,7 +19,7 @@ class Rover:
             obstacle_encountered (bool): Indique si le rover a rencontré un obstacle.
             obstacles (list): Liste des positions des obstacles sur la carte.
         """
-        self._x = x
+        self._x = x 
         self._y = y
         self.orientation = orientation
         self.obstacle_encountered = False
@@ -122,13 +124,13 @@ class Rover:
             tuple: Nouvelles coordonnées (x, y).
         """
         if self.orientation == 'N':
-            return self.x, self.y - step
+            return self.x, (self.y - step % Map.width)
         elif self.orientation == 'S':
-            return self.x, self.y + step
+            return self.x, (self.y + step % Map.width)
         elif self.orientation == 'E':
-            return self.x + step, self.y
+            return (self.x + step % Map.height), self.y
         elif self.orientation == 'O':
-            return self.x - step, self.y
+            return (self.x - step % Map.height), self.y
 
     def _check_collision(self, x, y):
         """
