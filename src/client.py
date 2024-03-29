@@ -28,7 +28,7 @@
 import asyncio
 import websockets
 
-class Rover:
+class RoverClient:
     def __init__(self, uri):
         self.uri = uri
 
@@ -50,18 +50,18 @@ class Rover:
     async def close_connection(self):
         await self.websocket.close()
 
-async def send_commands(rover):
+async def send_commands(rover_client):
     while True:
         command = input("------------------------------------------------------------\n Entrez une commande (avancer, reculer, gauche, droite, quitter): ")
         if command == 'quitter':
-            await rover.close_connection()
+            await rover_client.close_connection()
             break
-        await rover.send_command(command)
+        await rover_client.send_command(command)
 
 async def main():
     uri = "ws://localhost:8765"
-    rover = Rover(uri)
-    await rover.connect_to_server()
-    await send_commands(rover)
+    rover_client = RoverClient(uri)
+    await rover_client.connect_to_server()
+    await send_commands(rover_client)
 
 asyncio.run(main())
