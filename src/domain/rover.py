@@ -1,6 +1,6 @@
 # Class Domain Entité - Objet
 class Rover:
-    def __init__(self, x, y, orientation, obstacles, map):
+    def __init__(self, x, y, orientation, map, obstacles):
         """
         Initialise un objet Rover avec des coordonnées, une orientation et une liste d'obstacles.
 
@@ -8,23 +8,23 @@ class Rover:
             x (float): Coordonnée x initiale du rover.
             y (float): Coordonnée y initiale du rover.
             orientation (str): Orientation initiale du rover ('N', 'S', 'E' ou 'O').
+            map (Map): Objet Map représentant la carte.
             obstacles (list): Liste des positions des obstacles sur la carte.
-            map (list): Liste représentant la carte.
 
         Attributes:
             _x (float): Coordonnée x du rover (attribut privé).
             _y (float): Coordonnée y du rover (attribut privé).
             orientation (str): Orientation actuelle du rover.
             obstacle_encountered (bool): Indique si le rover a rencontré un obstacle.
+            map (Map): Objet Map représentant la carte.
             obstacles (list): Liste des positions des obstacles sur la carte.
-            map (list): Liste représentant la carte.
         """
         self._x = x
         self._y = y
         self.orientation = orientation
         self.obstacle_encountered = False
-        self.obstacles = obstacles
         self.map = map
+        self.obstacles = obstacles
 
     @property
     def x(self):
@@ -46,16 +46,14 @@ class Rover:
             tuple: Nouvelles coordonnées ajustées.
         """
         if x < 0:
-            x += len(self.map[0])  # Utilisation de len() pour obtenir la largeur de la carte
-        elif x >= len(self.map[0]):
-            x -= len(self.map[0])
-
+            x = self.map.width - 1
+        elif x >= self.map.width:
+            x = 0
         if y < 0:
-            y += len(self.map)  # Utilisation de len() pour obtenir la hauteur de la carte
-        elif y >= len(self.map):
-            y -= len(self.map)
-
-        return round(x, 2), round(y, 2)
+            y = self.map.height - 1
+        elif y >= self.map.height:
+            y = 0
+        return x, y
 
     def modifier_position(self, new_x, new_y):
         """
