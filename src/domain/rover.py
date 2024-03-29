@@ -9,7 +9,7 @@ class Rover:
             y (float): Coordonnée y initiale du rover.
             orientation (str): Orientation initiale du rover ('N', 'S', 'E' ou 'O').
             obstacles (list): Liste des positions des obstacles sur la carte.
-            map (Map): Objet représentant la carte.
+            map (list): Liste représentant la carte.
 
         Attributes:
             _x (float): Coordonnée x du rover (attribut privé).
@@ -17,7 +17,7 @@ class Rover:
             orientation (str): Orientation actuelle du rover.
             obstacle_encountered (bool): Indique si le rover a rencontré un obstacle.
             obstacles (list): Liste des positions des obstacles sur la carte.
-            map (Map): Objet représentant la carte.
+            map (list): Liste représentant la carte.
         """
         self._x = x
         self._y = y
@@ -46,16 +46,16 @@ class Rover:
             tuple: Nouvelles coordonnées ajustées.
         """
         if x < 0:
-            x += self.map.width
-        elif x >= self.map.width:
-            x -= self.map.width
+            x += len(self.map[0])  # Utilisation de len() pour obtenir la largeur de la carte
+        elif x >= len(self.map[0]):
+            x -= len(self.map[0])
 
         if y < 0:
-            y += self.map.height
-        elif y >= self.map.height:
-            y -= self.map.height
+            y += len(self.map)  # Utilisation de len() pour obtenir la hauteur de la carte
+        elif y >= len(self.map):
+            y -= len(self.map)
 
-        return round(x, 2), round(y, 2)   
+        return round(x, 2), round(y, 2)
 
     def modifier_position(self, new_x, new_y):
         """
@@ -130,13 +130,13 @@ class Rover:
 
     def _next_position(self, step):
         """
-        Calcule les nouvelles coordonnées du rover après un déplacement donné.
+        Calcule la prochaine position du rover en fonction de l'orientation et du pas.
 
         Args:
-            step (int): Nombre d'unités à déplacer (peut être négatif pour reculer).
+            step (int): Pas de déplacement (+1 pour avancer, -1 pour reculer).
 
         Returns:
-            tuple: Nouvelles coordonnées (x, y).
+            tuple: Coordonnées de la prochaine position.
         """
         if self.orientation == 'N':
             return self.x, self.y - step
@@ -152,11 +152,10 @@ class Rover:
         Vérifie s'il y a une collision avec un obstacle aux coordonnées spécifiées.
 
         Args:
-            x (float): Coordonnée x à vérifier.
-            y (float): Coordonnée y à vérifier.
+            x (float): Coordonnée x.
+            y (float): Coordonnée y.
 
         Returns:
             bool: True s'il y a collision, False sinon.
         """
-        collision = (round(x, 2), round(y, 2)) in self.obstacles
-        return collision
+        return (round(x), round(y)) in self.obstacles

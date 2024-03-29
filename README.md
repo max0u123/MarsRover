@@ -18,6 +18,11 @@ Par la suite, lorsque cela est demandé, lancer le fichier ```client.py```.
 
 ```python src/client.py```
 
+### Lancer les tests
+
+Pour lancer les tests, il suffit de lancer la commande :
+```python -m unittest tests.test_rover```.
+
 **Groupe A:**
 Maxime Coulon
 Gabriel Odillard
